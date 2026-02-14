@@ -95,6 +95,38 @@ npm run start     # Start production server
 npm run lint      # Run ESLint
 ```
 
+## Deployment
+
+### Vercel (Recommended)
+
+1. Push your code to GitHub
+2. Import your repository in [Vercel](https://vercel.com/new)
+3. Configure environment variables:
+   - `NEXT_PUBLIC_SANITY_PROJECT_ID` (optional)
+   - `NEXT_PUBLIC_SANITY_DATASET` (optional)
+   - `NEXT_PUBLIC_GA_ID` (optional)
+4. Deploy!
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https%3A%2F%2Fgithub.com%2Foptimus-fulcria%2Fsuperteam-brazil-lms)
+
+### Netlify
+
+1. Push your code to GitHub
+2. Import in [Netlify](https://app.netlify.com/start)
+3. Build command: `npm run build`
+4. Publish directory: `.next`
+5. Add environment variables as needed
+
+### Docker
+
+```bash
+# Build image
+docker build -t superteam-lms .
+
+# Run container
+docker run -p 3000:3000 superteam-lms
+```
+
 ## Architecture
 
 See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed technical documentation.
