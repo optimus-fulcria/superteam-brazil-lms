@@ -13,6 +13,7 @@ import {
   LedgerWalletAdapter,
 } from '@solana/wallet-adapter-wallets';
 import { getRpcEndpoint } from '@/lib/solana/config';
+import { ProgressProvider } from '@/contexts/ProgressContext';
 
 // Import wallet adapter styles
 import '@solana/wallet-adapter-react-ui/styles.css';
@@ -37,7 +38,9 @@ export const WalletProvider: FC<WalletProviderProps> = ({ children }) => {
   return (
     <ConnectionProvider endpoint={endpoint}>
       <SolanaWalletProvider wallets={wallets} autoConnect>
-        <WalletModalProvider>{children}</WalletModalProvider>
+        <WalletModalProvider>
+          <ProgressProvider>{children}</ProgressProvider>
+        </WalletModalProvider>
       </SolanaWalletProvider>
     </ConnectionProvider>
   );

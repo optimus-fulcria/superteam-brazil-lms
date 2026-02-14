@@ -21,6 +21,8 @@ import {
   Lock
 } from "lucide-react";
 import Link from "next/link";
+import { useProgress } from "@/contexts/ProgressContext";
+import { useWallet } from "@solana/wallet-adapter-react";
 
 // Mock user data
 const userData = {
@@ -104,7 +106,20 @@ function StatCard({
 }
 
 export default function DashboardPage() {
-  const xpProgress = (userData.xp / userData.nextLevelXp) * 100;
+  const { progress, isLoading } = useProgress();
+  const { publicKey, connected } = useWallet();
+
+  // Merge real progress with mock data for display
+  const displayData = {
+    ...userData,
+    xp: progress?.totalXP ?? userData.xp,
+    streak: progress?.currentStreak ?? userData.streak,
+    longestStreak: progress?.longestStreak ?? userData.longestStreak,
+    lessonsCompleted: progress?.completedLessons?.length ?? userData.lessonsCompleted,
+    address: publicKey ? `${publicKey.toBase58().slice(0, 4)}...${publicKey.toBase58().slice(-4)}` : userData.address
+  };
+
+  const xpProgress = (displayData.xp / userData.nextLevelXp) * 100;
 
   return (
     <div className="flex flex-col min-h-screen">
@@ -129,10 +144,10 @@ export default function DashboardPage() {
           <div className="ml-auto flex items-center gap-4">
             <div className="flex items-center gap-2 text-sm">
               <Flame className="h-4 w-4 text-orange-500" />
-              <span className="font-medium">{userData.streak} day streak</span>
+              <span className="font-medium">{displayData.streak} day streak</span>
             </div>
             <Button variant="outline" size="sm">
-              {userData.address}
+              {displayData.address}
             </Button>
           </div>
         </div>
@@ -160,7 +175,7 @@ export default function DashboardPage() {
               <div className="flex justify-between text-sm mb-1">
                 <span className="flex items-center gap-1">
                   <Zap className="h-4 w-4 text-yellow-500" />
-                  {userData.xp.toLocaleString()} XP
+                  {displayData.xp.toLocaleString()} XP
                 </span>
                 <span className="text-muted-foreground">{userData.nextLevelXp.toLocaleString()} XP to Level {userData.level + 1}</span>
               </div>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import Editor from "@monaco-editor/react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +16,6 @@ import {
   Loader2,
   Terminal,
   FileCode,
-  BookOpen,
   Lightbulb,
   RotateCcw,
   Copy,
@@ -26,6 +25,8 @@ import {
   Zap
 } from "lucide-react";
 import Link from "next/link";
+import { useProgress } from "@/contexts/ProgressContext";
+import { ConnectButton } from "@/components/wallet/ConnectButton";
 
 // Mock lesson data
 const lesson = {
@@ -96,6 +97,7 @@ export function createKeypair(): { publicKey: string } {
 };
 
 export default function LessonPage() {
+  const { completeLesson, isLessonCompleted, progress } = useProgress();
   const [code, setCode] = useState(lesson.starterCode);
   const [output, setOutput] = useState<string>("");
   const [isRunning, setIsRunning] = useState(false);
@@ -104,6 +106,16 @@ export default function LessonPage() {
   const [copied, setCopied] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [activeTab, setActiveTab] = useState<"output" | "tests">("tests");
+
+  const [lessonCompleted, setLessonCompleted] = useState(false);
+
+  // Check if lesson was previously completed
+  useEffect(() => {
+    const completed = isLessonCompleted(lesson.id, lesson.courseSlug);
+    if (completed) {
+      setLessonCompleted(true);
+    }
+  }, [isLessonCompleted]);
 
   const runCode = useCallback(async () => {
     setIsRunning(true);
@@ -128,13 +140,18 @@ export default function LessonPage() {
 
     if (newResults.every(t => t.passed)) {
       setOutput("All tests passed! You've earned 50 XP.");
+      // Persist the completion
+      if (!lessonCompleted) {
+        await completeLesson(lesson.id, lesson.courseSlug, lesson.xpReward);
+        setLessonCompleted(true);
+      }
     } else {
       const failed = newResults.filter(t => !t.passed).length;
       setOutput(`${failed} test(s) failed. Check your code and try again.`);
     }
 
     setIsRunning(false);
-  }, [code]);
+  }, [code, completeLesson, lessonCompleted]);
 
   const resetCode = () => {
     setCode(lesson.starterCode);
@@ -183,11 +200,9 @@ export default function LessonPage() {
         <div className="flex items-center gap-2">
           <Badge variant="secondary" className="gap-1">
             <Zap className="h-3 w-3 text-yellow-500" />
-            {lesson.xpReward} XP
+            {progress?.totalXP || 0} XP
           </Badge>
-          <Button variant="outline" size="sm">
-            Connect Wallet
-          </Button>
+          <ConnectButton />
         </div>
       </header>
 
