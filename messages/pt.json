@@ -79,12 +79,30 @@
   },
   "courses": {
     "title": "Catalogo de Cursos",
-    "subtitle": "Explore nosso curriculo abrangente projetado para desenvolvedores de todos os niveis.",
+    "subtitle": "Da sua primeira transacao a construcao de protocolos DeFi complexos. Escolha seu caminho e comece a ganhar credenciais on-chain.",
+    "searchPlaceholder": "Buscar cursos...",
     "filters": {
-      "all": "Todos os Cursos",
+      "all": "Todos"
+    },
+    "levels": {
       "beginner": "Iniciante",
       "intermediate": "Intermediario",
       "advanced": "Avancado"
+    },
+    "featured": "Destaque",
+    "featuredCourses": "Cursos em Destaque",
+    "allCourses": "Todos os Cursos",
+    "coursesFound": "cursos encontrados",
+    "courses": "cursos",
+    "lessons": "licoes",
+    "noCoursesFound": "Nenhum curso encontrado com seus criterios. Tente ajustar sua busca ou filtro.",
+    "clearFilters": "Limpar filtros",
+    "startCourse": "Iniciar Curso",
+    "notSureWhereToStart": "Nao sabe por onde comecar?",
+    "takeAssessmentDescription": "Faca nossa avaliacao rapida para obter um caminho de aprendizado personalizado baseado no seu nivel de experiencia e objetivos.",
+    "takeAssessment": "Fazer Avaliacao",
+    "footer": {
+      "builtBy": "Construido pela Superteam Brazil"
     },
     "card": {
       "lessons": "licoes",
@@ -93,6 +111,43 @@
       "enroll": "Inscrever-se",
       "continue": "Continuar",
       "completed": "Concluido"
+    }
+  },
+  "courseDetail": {
+    "breadcrumb": {
+      "courses": "Cursos"
+    },
+    "lessons": "licoes",
+    "enrolled": "inscritos",
+    "continueLearning": "Continuar Aprendendo",
+    "progress": {
+      "title": "Seu Progresso",
+      "of": "de",
+      "xpEarned": "XP Ganho",
+      "timeSpent": "Tempo Gasto",
+      "streak": "Sequencia Atual",
+      "days": "dias"
+    },
+    "tabs": {
+      "curriculum": "Curriculo",
+      "overview": "Visao Geral",
+      "reviews": "Avaliacoes"
+    },
+    "lessonsCompleted": "licoes concluidas",
+    "whatYouWillLearn": "O Que Voce Vai Aprender",
+    "reviewsComingSoon": "Avaliacoes em breve...",
+    "instructor": {
+      "title": "Instrutor",
+      "courses": "cursos"
+    },
+    "credential": {
+      "title": "Ganhe uma Credencial",
+      "description": "Complete este curso para ganhar uma credencial on-chain verificavel (cNFT) que comprova suas habilidades para empregadores e colaboradores."
+    },
+    "notFound": {
+      "title": "Curso Nao Encontrado",
+      "description": "O curso que voce procura nao existe ou foi removido.",
+      "backToCourses": "Voltar aos Cursos"
     }
   },
   "lesson": {

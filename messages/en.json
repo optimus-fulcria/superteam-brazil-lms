@@ -79,12 +79,30 @@
   },
   "courses": {
     "title": "Course Catalog",
-    "subtitle": "Explore our comprehensive curriculum designed for developers at every level.",
+    "subtitle": "From your first transaction to building complex DeFi protocols. Choose your path and start earning on-chain credentials.",
+    "searchPlaceholder": "Search courses...",
     "filters": {
-      "all": "All Courses",
+      "all": "All"
+    },
+    "levels": {
       "beginner": "Beginner",
       "intermediate": "Intermediate",
       "advanced": "Advanced"
+    },
+    "featured": "Featured",
+    "featuredCourses": "Featured Courses",
+    "allCourses": "All Courses",
+    "coursesFound": "courses found",
+    "courses": "courses",
+    "lessons": "lessons",
+    "noCoursesFound": "No courses found matching your criteria. Try adjusting your search or filter.",
+    "clearFilters": "Clear filters",
+    "startCourse": "Start Course",
+    "notSureWhereToStart": "Not sure where to start?",
+    "takeAssessmentDescription": "Take our quick assessment to get a personalized learning path based on your experience level and goals.",
+    "takeAssessment": "Take Assessment",
+    "footer": {
+      "builtBy": "Built by Superteam Brazil"
     },
     "card": {
       "lessons": "lessons",
@@ -93,6 +111,43 @@
       "enroll": "Enroll",
       "continue": "Continue",
       "completed": "Completed"
+    }
+  },
+  "courseDetail": {
+    "breadcrumb": {
+      "courses": "Courses"
+    },
+    "lessons": "lessons",
+    "enrolled": "enrolled",
+    "continueLearning": "Continue Learning",
+    "progress": {
+      "title": "Your Progress",
+      "of": "of",
+      "xpEarned": "XP Earned",
+      "timeSpent": "Time Spent",
+      "streak": "Current Streak",
+      "days": "days"
+    },
+    "tabs": {
+      "curriculum": "Curriculum",
+      "overview": "Overview",
+      "reviews": "Reviews"
+    },
+    "lessonsCompleted": "lessons completed",
+    "whatYouWillLearn": "What You'll Learn",
+    "reviewsComingSoon": "Reviews coming soon...",
+    "instructor": {
+      "title": "Instructor",
+      "courses": "courses"
+    },
+    "credential": {
+      "title": "Earn a Credential",
+      "description": "Complete this course to earn a verifiable on-chain credential (cNFT) that proves your skills to employers and collaborators."
+    },
+    "notFound": {
+      "title": "Course Not Found",
+      "description": "The course you're looking for doesn't exist or has been removed.",
+      "backToCourses": "Back to Courses"
     }
   },
   "lesson": {

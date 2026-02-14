@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
@@ -15,82 +15,20 @@ import {
   Zap,
   CheckCircle,
   Circle,
-  Lock,
   PlayCircle,
   FileCode,
   Trophy,
   Share2,
-  Bookmark
+  Bookmark,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
-
-// Mock course data
-const course = {
-  id: "solana-101",
-  slug: "solana-101",
-  title: "Solana 101: Getting Started",
-  description: "Your first steps into Solana development. Learn the basics of accounts, transactions, and the Solana runtime. By the end of this course, you'll understand the core concepts that make Solana unique and be ready to build your first dApp.",
-  level: "beginner",
-  duration: "4 hours",
-  totalLessons: 12,
-  students: 1250,
-  rating: 4.8,
-  reviews: 234,
-  xpReward: 500,
-  tags: ["fundamentals", "wallets", "transactions", "accounts"],
-  instructor: {
-    name: "Superteam Brazil",
-    avatar: "/avatars/superteam.png",
-    courses: 6
-  },
-  prerequisites: [],
-  whatYouWillLearn: [
-    "Understand the Solana account model and how data is stored on-chain",
-    "Create and sign transactions using popular wallets",
-    "Read and write data to Solana accounts",
-    "Use the Solana CLI and web3.js library",
-    "Deploy your first program to devnet"
-  ],
-  modules: [
-    {
-      id: "mod-1",
-      title: "Introduction to Solana",
-      lessons: [
-        { id: "les-1", title: "What Makes Solana Different", duration: "10 min", type: "video", completed: true },
-        { id: "les-2", title: "The Account Model Explained", duration: "15 min", type: "article", completed: true },
-        { id: "les-3", title: "Quiz: Solana Basics", duration: "5 min", type: "quiz", completed: false }
-      ]
-    },
-    {
-      id: "mod-2",
-      title: "Setting Up Your Environment",
-      lessons: [
-        { id: "les-4", title: "Installing the Solana CLI", duration: "12 min", type: "video", completed: false },
-        { id: "les-5", title: "Configuring Your Wallet", duration: "8 min", type: "article", completed: false },
-        { id: "les-6", title: "Practice: Create a Keypair", duration: "10 min", type: "code", completed: false }
-      ]
-    },
-    {
-      id: "mod-3",
-      title: "Your First Transaction",
-      lessons: [
-        { id: "les-7", title: "Anatomy of a Transaction", duration: "15 min", type: "video", completed: false },
-        { id: "les-8", title: "Building Transactions with web3.js", duration: "20 min", type: "code", completed: false },
-        { id: "les-9", title: "Challenge: Send SOL", duration: "15 min", type: "code", completed: false }
-      ]
-    },
-    {
-      id: "mod-4",
-      title: "Working with Accounts",
-      lessons: [
-        { id: "les-10", title: "Account Data Layout", duration: "18 min", type: "article", completed: false },
-        { id: "les-11", title: "Reading Account Data", duration: "15 min", type: "code", completed: false },
-        { id: "les-12", title: "Final Project: Token Balance Viewer", duration: "30 min", type: "project", completed: false }
-      ]
-    }
-  ]
-};
+import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
+import { getCourseBySlug } from "@/lib/data/courses";
+import type { Course, LessonReference } from "@/lib/sanity/types";
+import { Header } from "@/components/navigation/Header";
 
 const lessonTypeIcons = {
   video: PlayCircle,
@@ -106,8 +44,79 @@ const levelConfig = {
   advanced: { color: "bg-red-500", textColor: "text-red-500" }
 };
 
+// Extended course type with mock module structure
+interface ModuleLesson {
+  id: string;
+  title: string;
+  duration: string;
+  type: string;
+  completed: boolean;
+}
+
+interface Module {
+  id: string;
+  title: string;
+  lessons: ModuleLesson[];
+}
+
+// Transform flat lessons into modules for display
+function transformToModules(lessons: LessonReference[] | undefined): Module[] {
+  if (!lessons || lessons.length === 0) {
+    return [
+      {
+        id: "mod-1",
+        title: "Introduction",
+        lessons: [
+          { id: "les-1", title: "Getting Started", duration: "10 min", type: "video", completed: false }
+        ]
+      }
+    ];
+  }
+
+  // Group lessons into modules of 3-4 lessons each
+  const modulesCount = Math.ceil(lessons.length / 3);
+  const modules: Module[] = [];
+
+  for (let i = 0; i < modulesCount; i++) {
+    const startIdx = i * 3;
+    const endIdx = Math.min(startIdx + 3, lessons.length);
+    const moduleLessons = lessons.slice(startIdx, endIdx);
+
+    modules.push({
+      id: `mod-${i + 1}`,
+      title: `Module ${i + 1}`,
+      lessons: moduleLessons.map((lesson, idx) => ({
+        id: lesson._id,
+        title: lesson.title,
+        duration: lesson.duration || "15 min",
+        type: idx === 0 ? "video" : idx === 1 ? "code" : "article",
+        completed: false
+      }))
+    });
+  }
+
+  return modules;
+}
+
 export default function CourseDetailPage() {
+  const params = useParams();
+  const t = useTranslations("courseDetail");
+  const tCourses = useTranslations("courses");
+  const slug = params.slug as string;
+
+  const [course, setCourse] = useState<Course | null>(null);
+  const [loading, setLoading] = useState(true);
   const [expandedModules, setExpandedModules] = useState<string[]>(["mod-1"]);
+
+  useEffect(() => {
+    const loadCourse = async () => {
+      setLoading(true);
+      const data = await getCourseBySlug(slug);
+      setCourse(data);
+      setLoading(false);
+    };
+    loadCourse();
+  }, [slug]);
 
   const toggleModule = (moduleId: string) => {
     setExpandedModules(prev =>
@@ -117,35 +126,44 @@ export default function CourseDetailPage() {
     );
   };
 
-  const completedLessons = course.modules
-    .flatMap(m => m.lessons)
-    .filter(l => l.completed).length;
-  const progress = Math.round((completedLessons / course.totalLessons) * 100);
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Loader2 className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
+  if (!course) {
+    return (
+      <div className="flex flex-col min-h-screen">
+        <Header />
+        <div className="flex-1 flex items-center justify-center">
+          <Card className="p-8 text-center">
+            <h2 className="text-xl font-semibold mb-2">{t("notFound.title")}</h2>
+            <p className="text-muted-foreground mb-4">{t("notFound.description")}</p>
+            <Button asChild>
+              <Link href="/courses">{t("notFound.backToCourses")}</Link>
+            </Button>
+          </Card>
+        </div>
+      </div>
+    );
+  }
+
+  const modules = transformToModules(course.lessons);
+  const totalLessons = modules.reduce((acc, m) => acc + m.lessons.length, 0);
+  const completedLessons = modules.flatMap(m => m.lessons).filter(l => l.completed).length;
+  const progress = Math.round((completedLessons / totalLessons) * 100);
   const level = levelConfig[course.level as keyof typeof levelConfig];
+  const courseSlug = typeof course.slug === 'string' ? course.slug : course.slug.current;
 
   return (
     <div className="flex flex-col min-h-screen">
-      {/* Navigation */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-        <div className="container flex h-14 items-center">
-          <Link href="/" className="flex items-center gap-2 font-bold text-xl">
-            <Code2 className="h-6 w-6 text-primary" />
-            <span>Superteam Academy</span>
-          </Link>
-          <nav className="flex items-center gap-6 ml-8 text-sm">
-            <Link href="/courses" className="text-muted-foreground hover:text-foreground transition-colors">
-              Courses
-            </Link>
-            <Link href="/leaderboard" className="text-muted-foreground hover:text-foreground transition-colors">
-              Leaderboard
-            </Link>
-          </nav>
-          <div className="ml-auto">
-            <Button>Connect Wallet</Button>
-          </div>
-        </div>
-      </header>
+      <Header />
 
       {/* Course Header */}
       <section className="border-b bg-muted/30">
@@ -155,15 +173,15 @@ export default function CourseDetailPage() {
             <div className="flex-1">
               <div className="flex items-center gap-2 mb-4">
                 <Link href="/courses" className="text-sm text-muted-foreground hover:text-foreground">
-                  Courses
+                  {t("breadcrumb.courses")}
                 </Link>
                 <ChevronRight className="h-4 w-4 text-muted-foreground" />
                 <span className="text-sm">{course.title}</span>
               </div>
 
               <div className="flex items-center gap-2 mb-4">
-                <Badge className={level.color}>{course.level}</Badge>
-                {course.tags.slice(0, 3).map(tag => (
+                <Badge className={level.color}>{tCourses(`levels.${course.level}`)}</Badge>
+                {course.tags?.slice(0, 3).map(tag => (
                   <Badge key={tag} variant="secondary">{tag}</Badge>
                 ))}
               </div>
@@ -178,15 +196,15 @@ export default function CourseDetailPage() {
                 </div>
                 <div className="flex items-center gap-1">
                   <BookOpen className="h-4 w-4" />
-                  {course.totalLessons} lessons
+                  {course.lessonsCount || totalLessons} {t("lessons")}
                 </div>
                 <div className="flex items-center gap-1">
                   <Users className="h-4 w-4" />
-                  {course.students.toLocaleString()} enrolled
+                  {course.studentsCount?.toLocaleString()} {t("enrolled")}
                 </div>
                 <div className="flex items-center gap-1">
                   <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />
-                  {course.rating} ({course.reviews} reviews)
+                  {course.rating}
                 </div>
                 <div className="flex items-center gap-1">
                   <Zap className="h-4 w-4 text-yellow-500" />
@@ -197,7 +215,7 @@ export default function CourseDetailPage() {
               <div className="flex items-center gap-4">
                 <Button size="lg" className="gap-2">
                   <PlayCircle className="h-5 w-5" />
-                  Continue Learning
+                  {t("continueLearning")}
                 </Button>
                 <Button variant="outline" size="lg">
                   <Bookmark className="h-5 w-5" />
@@ -211,12 +229,12 @@ export default function CourseDetailPage() {
             {/* Progress Card */}
             <Card className="lg:w-80 shrink-0">
               <CardHeader>
-                <CardTitle className="text-lg">Your Progress</CardTitle>
+                <CardTitle className="text-lg">{t("progress.title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-2">
-                    <span>{completedLessons} of {course.totalLessons} lessons</span>
+                    <span>{completedLessons} {t("progress.of")} {totalLessons} {t("lessons")}</span>
                     <span className="font-medium">{progress}%</span>
                   </div>
                   <div className="h-2 bg-muted rounded-full overflow-hidden">
@@ -229,19 +247,19 @@ export default function CourseDetailPage() {
 
                 <div className="space-y-3 text-sm">
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">XP Earned</span>
+                    <span className="text-muted-foreground">{t("progress.xpEarned")}</span>
                     <span className="font-medium flex items-center gap-1">
                       <Zap className="h-4 w-4 text-yellow-500" />
                       {Math.round(course.xpReward * (progress / 100))} / {course.xpReward}
                     </span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Time Spent</span>
-                    <span className="font-medium">45 min</span>
+                    <span className="text-muted-foreground">{t("progress.timeSpent")}</span>
+                    <span className="font-medium">0 min</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-muted-foreground">Current Streak</span>
-                    <span className="font-medium">3 days</span>
+                    <span className="text-muted-foreground">{t("progress.streak")}</span>
+                    <span className="font-medium">0 {t("progress.days")}</span>
                   </div>
                 </div>
               </CardContent>
@@ -257,13 +275,13 @@ export default function CourseDetailPage() {
           <div className="lg:col-span-2">
             <Tabs defaultValue="curriculum">
               <TabsList className="mb-6">
-                <TabsTrigger value="curriculum">Curriculum</TabsTrigger>
-                <TabsTrigger value="overview">Overview</TabsTrigger>
-                <TabsTrigger value="reviews">Reviews</TabsTrigger>
+                <TabsTrigger value="curriculum">{t("tabs.curriculum")}</TabsTrigger>
+                <TabsTrigger value="overview">{t("tabs.overview")}</TabsTrigger>
+                <TabsTrigger value="reviews">{t("tabs.reviews")}</TabsTrigger>
               </TabsList>
 
               <TabsContent value="curriculum" className="space-y-4">
-                {course.modules.map((module, moduleIndex) => {
+                {modules.map((module, moduleIndex) => {
                   const isExpanded = expandedModules.includes(module.id);
                   const moduleCompleted = module.lessons.filter(l => l.completed).length;
 
@@ -280,7 +298,7 @@ export default function CourseDetailPage() {
                           <div className="text-left">
                             <h3 className="font-medium">{module.title}</h3>
                             <p className="text-sm text-muted-foreground">
-                              {moduleCompleted}/{module.lessons.length} lessons completed
+                              {moduleCompleted}/{module.lessons.length} {t("lessonsCompleted")}
                             </p>
                           </div>
                         </div>
@@ -293,11 +311,11 @@ export default function CourseDetailPage() {
                         <CardContent className="pt-0">
                           <div className="space-y-1 border-t pt-4">
                             {module.lessons.map((lesson) => {
-                              const LessonIcon = lessonTypeIcons[lesson.type as keyof typeof lessonTypeIcons];
+                              const LessonIcon = lessonTypeIcons[lesson.type as keyof typeof lessonTypeIcons] || BookOpen;
                               return (
                                 <Link
                                   key={lesson.id}
-                                  href={`/courses/${course.slug}/${lesson.id}`}
+                                  href={`/courses/${courseSlug}/${lesson.id}`}
                                   className="flex items-center gap-4 p-3 rounded-lg hover:bg-muted/50 transition-colors group"
                                 >
                                   <div className="flex items-center justify-center w-8 h-8">
@@ -333,11 +351,16 @@ export default function CourseDetailPage() {
               <TabsContent value="overview">
                 <Card>
                   <CardHeader>
-                    <CardTitle>What You&apos;ll Learn</CardTitle>
+                    <CardTitle>{t("whatYouWillLearn")}</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <ul className="grid md:grid-cols-2 gap-3">
-                      {course.whatYouWillLearn.map((item, i) => (
+                      {(course.whatYouWillLearn || [
+                        "Understand core concepts and fundamentals",
+                        "Build practical skills through hands-on exercises",
+                        "Complete real-world projects",
+                        "Earn verifiable on-chain credentials"
+                      ]).map((item, i) => (
                         <li key={i} className="flex items-start gap-2">
                           <CheckCircle className="h-5 w-5 text-green-500 shrink-0 mt-0.5" />
                           <span className="text-sm">{item}</span>
@@ -351,7 +374,7 @@ export default function CourseDetailPage() {
               <TabsContent value="reviews">
                 <Card className="p-6 text-center text-muted-foreground">
                   <Star className="h-8 w-8 mx-auto mb-2 text-yellow-500" />
-                  <p>Reviews coming soon...</p>
+                  <p>{t("reviewsComingSoon")}</p>
                 </Card>
               </TabsContent>
             </Tabs>
@@ -362,7 +385,7 @@ export default function CourseDetailPage() {
             {/* Instructor Card */}
             <Card>
               <CardHeader>
-                <CardTitle className="text-lg">Instructor</CardTitle>
+                <CardTitle className="text-lg">{t("instructor.title")}</CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="flex items-center gap-4">
@@ -370,9 +393,9 @@ export default function CourseDetailPage() {
                     <Code2 className="h-6 w-6 text-primary" />
                   </div>
                   <div>
-                    <p className="font-medium">{course.instructor.name}</p>
+                    <p className="font-medium">{course.instructor}</p>
                     <p className="text-sm text-muted-foreground">
-                      {course.instructor.courses} courses
+                      6 {t("instructor.courses")}
                     </p>
                   </div>
                 </div>
@@ -384,14 +407,11 @@ export default function CourseDetailPage() {
               <CardHeader>
                 <CardTitle className="text-lg flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-yellow-500" />
-                  Earn a Credential
+                  {t("credential.title")}
                 </CardTitle>
               </CardHeader>
               <CardContent className="text-sm text-muted-foreground">
-                <p>
-                  Complete this course to earn a verifiable on-chain credential (cNFT)
-                  that proves your skills to employers and collaborators.
-                </p>
+                <p>{t("credential.description")}</p>
               </CardContent>
             </Card>
           </div>
@@ -406,7 +426,7 @@ export default function CourseDetailPage() {
             <span className="font-semibold">Superteam Academy</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            Built by Superteam Brazil
+            {tCourses("footer.builtBy")}
           </p>
         </div>
       </footer>

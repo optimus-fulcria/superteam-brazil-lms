@@ -1,36 +1,116 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Superteam Academy LMS
+
+A decentralized Learning Management System (LMS) built for Superteam Brazil. Learn Solana development, earn on-chain credentials, and track your progress with gamified learning experiences.
+
+## Features
+
+- **Interactive Courses**: Learn Solana development through hands-on coding exercises
+- **Multi-language Support**: Available in Portuguese, Spanish, and English
+- **Gamification**: Earn XP, maintain streaks, and climb the leaderboard
+- **On-chain Credentials**: Receive verifiable NFT credentials upon course completion
+- **Monaco Code Editor**: VS Code-like coding experience in the browser
+- **Responsive Design**: Works seamlessly on desktop and mobile
+
+## Tech Stack
+
+- **Framework**: Next.js 16+ with App Router
+- **Language**: TypeScript (strict mode)
+- **Styling**: Tailwind CSS + shadcn/ui
+- **Blockchain**: Solana Wallet Adapter
+- **CMS**: Sanity (optional, falls back to mock data)
+- **i18n**: next-intl (PT/ES/EN)
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+
+- Node.js 18+
+- pnpm or npm
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/solanabr/superteam-academy.git
+cd superteam-academy
+
+# Install dependencies
+npm install
+
+# Run development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Environment Variables
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file:
 
-## Learn More
+```env
+# Optional: Sanity CMS
+NEXT_PUBLIC_SANITY_PROJECT_ID=your-project-id
+NEXT_PUBLIC_SANITY_DATASET=production
 
-To learn more about Next.js, take a look at the following resources:
+# Optional: Analytics
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+src/
+├── app/                    # Next.js App Router pages
+│   └── [locale]/           # Locale-specific routes
+├── components/
+│   ├── ui/                 # shadcn base components
+│   ├── navigation/         # Header, navigation
+│   ├── gamification/       # XP display, streaks
+│   ├── wallet/             # Wallet connection
+│   └── locale/             # Language switcher
+├── lib/
+│   ├── sanity/             # CMS client, queries, types
+│   ├── data/               # Data fetching layer
+│   ├── solana/             # Wallet config
+│   └── utils/              # Helpers
+├── messages/               # i18n translations
+│   ├── en.json
+│   ├── pt.json
+│   └── es.json
+└── i18n/                   # i18n configuration
+```
 
-## Deploy on Vercel
+## CMS Integration
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+The app supports Sanity CMS for course content management. Without CMS configuration, it uses built-in mock data.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [docs/CMS_GUIDE.md](docs/CMS_GUIDE.md) for setup instructions.
+
+## Available Scripts
+
+```bash
+npm run dev       # Start development server
+npm run build     # Build for production
+npm run start     # Start production server
+npm run lint      # Run ESLint
+```
+
+## Architecture
+
+See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for detailed technical documentation.
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Run tests and linting
+5. Submit a pull request
+
+## License
+
+MIT License - see LICENSE file for details.
+
+---
+
+Built with love by the Solana community for Superteam Brazil.
