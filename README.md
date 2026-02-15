@@ -1,5 +1,7 @@
 # Superteam Academy LMS
 
+🌐 **Live Demo**: [superteam-brazil-mom5cryr2-eric-gaudets-projects.vercel.app](https://superteam-brazil-mom5cryr2-eric-gaudets-projects.vercel.app)
+
 A decentralized Learning Management System (LMS) built for Superteam Brazil. Learn Solana development, earn on-chain credentials, and track your progress with gamified learning experiences.
 
 ## Features
